@@ -75,7 +75,7 @@ public class AuthenticationController : ControllerBase
 			_config.GetValue<string>("Authentication:Audience"),
 			claims,
 			DateTime.UtcNow,
-			DateTime.UtcNow.AddMinutes(10),
+			DateTime.UtcNow.AddMinutes(60),
 			signingCredentials);
 
 		return new JwtSecurityTokenHandler().WriteToken(token);

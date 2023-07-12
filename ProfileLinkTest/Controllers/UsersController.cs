@@ -53,6 +53,7 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpGet("profile/{username}")]
+	[AllowAnonymous]
 	public async Task<ActionResult<UserDTO>> GetByUsername(string username)
 	{
 		var user = await _context.Users
@@ -113,6 +114,39 @@ public class UsersController : ControllerBase
 		else
 		{
 			return BadRequest();
+		}
+	}
+
+	public record UserData(string FirstName, string LastName, string Username, string Bio, string Theme);
+
+	[HttpPut("{id}")]
+	public async Task<IActionResult> UpdateUser(int id, [FromBody] UserData data)
+	{
+		if (data.FirstName == null || data.LastName == null || data.Username == null || data.Bio == null || data.Theme == null)
+		{
+			return BadRequest();
+		}
+
+		var user = _context.Users.Where(l => l.UserId == id).FirstOrDefault();
+		if (user == null)
+		{
+			return NotFound();
+		}
+
+		user.FirstName = data.FirstName;
+		user.LastName = data.LastName;
+		user.Username = data.Username;
+		user.Bio = data.Bio;
+		user.Theme = data.Theme;
+
+		try
+		{
+			await _context.SaveChangesAsync();
+			return NoContent();
+		}
+		catch (Exception)
+		{
+			return NotFound();
 		}
 	}
 
